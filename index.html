@@ -81,11 +81,7 @@
        ❌ username atau password salah. Silakan coba lagi.
       </div>
      </div><!-- Info Box -->
-     <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-emerald-100 text-sm hidden">
-      <p class="font-bold mb-2">📝 Akun Demo:</p>
-      <p><strong>Siswa:</strong><br>
-        siswa | siswa123</p>
-     </div>
+     
     </div>
    </section><!-- DASHBOARD SCREEN (Hidden until login) -->
    <section id="dashboard-screen" class="hidden h-full flex flex-col">
@@ -212,8 +208,31 @@
 
     // Demo users database with student IDs
     let allUsers = [
-      { username: 'siswa', password: 'siswa123', role: 'siswa', studentId: 1 },
-    ];
+        {
+          username: 'siswa1',
+          password: '123',
+          role: 'siswa',
+          nama_siswa: 'Ahmad Fauzan',
+          kelas: '1A',
+          studentId: 1
+        },
+        {
+          username: 'siswa2',
+          password: '123',
+          role: 'siswa',
+          nama_siswa: 'Muhammad Rizki',
+          kelas: '1A',
+          studentId: 2
+        },
+        {
+          username: 'admin',
+          password: 'admin123',
+          role: 'admin',
+          nama_siswa: 'Administrator',
+          kelas: '-',
+          studentId: null
+        }
+      ];
 
     // Point system
     const pointSystem = {
@@ -235,33 +254,23 @@
       dzikir_petang: 3
     };
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzMnpBfTAmR3CaVhMsIi6tOfg5kCfK_lqGyDHpZ8kM2gwtVwyucJHHtji_dBER_e28/exec";
+    
 
-      async function handleUserLogin(e) {
+    function handleUserLogin(e) {
         e.preventDefault();
 
-        const username = document.getElementById('user-username').value;
-        const password = document.getElementById('user-password').value;
+        const username = document.getElementById('user-username').value.trim();
+        const password = document.getElementById('user-password').value.trim();
 
-        try {
-          const response = await fetch(
-            `${WEB_APP_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-          );
+        // Cari user di database HTML
+        const foundUser = allUsers.find(user =>
+          user.username === username && user.password === password
+        );
 
-          const result = await response.json();
-
-          if (result.status === "success") {
-            currentUser = result;
-
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
-            document.getElementById('current-user').textContent = result.nama_siswa;
-
-          } else {
-            showLoginError();
-          }
-
-        } catch (error) {
+        if (foundUser) {
+          // Gunakan function login yang sudah ada
+          login(foundUser.username, foundUser.role, foundUser.studentId);
+        } else {
           showLoginError();
         }
       }
@@ -628,4 +637,3 @@
   </script>
  </body>
 </html>
-
