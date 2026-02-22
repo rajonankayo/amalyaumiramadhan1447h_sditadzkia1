@@ -419,7 +419,7 @@
       try {
         await fetch(WEB_APP_URL, {
           method: "POST",
-          mode: "cors",
+          mode: "no-cors",
           body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json"
