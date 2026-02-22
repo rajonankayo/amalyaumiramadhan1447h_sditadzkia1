@@ -112,7 +112,7 @@
     <main class="max-w-4xl mx-auto px-4 pb-8 flex-1">
      <!-- Navigation Tabs -->
      <div class="flex justify-center gap-2 mb-6">
-      <button id="tab-input" onclick="showTab('input')" class="px-6 py-2 rounded-full font-medium transition-all bg-yellow-400 text-emerald-900"> ✍️ Input Amal </button> <button id="tab-riwayat" onclick="window.open('https://docs.google.com/spreadsheets/d/1ZO8Rb2BsW97TzmmC8UgPQt7evLLrmzKzylEUGmDu1gU/edit?usp=sharing', '_blank')" class="px-6 py-2 rounded-full font-medium transition-all bg-emerald-700 text-white hover:bg-emerald-600"> 📋 Riwayat </button>
+      <button id="tab-input" onclick="showTab('input')" class="px-6 py-2 rounded-full font-medium transition-all bg-yellow-400 text-emerald-900"> ✍️ Input Amal </button> <button id="tab-riwayat" onclick="window.open('https://docs.google.com/spreadsheets/d/1ypjZ2KuPRgo60LNzxkkbrejLVrwPmDcHuj5H0XF41vg/edit?usp=sharing', '_blank')" class="px-6 py-2 rounded-full font-medium transition-all bg-emerald-700 text-white hover:bg-emerald-600"> 📋 Lihat Rekapan </button>
      </div><!-- Input Form Section -->
      <section id="section-input" class="animate-fade-in">
       <form id="amal-form" class="bg-white/95 backdrop-blur rounded-2xl shadow-xl p-6 glow-green">
@@ -392,7 +392,7 @@
       // Calculate points
       let totalPoin = 0;
       const formData = {
-        username_login: currentUser ? currentUser.username : null,
+        username: currentUser.username,
         nama_siswa: document.getElementById('nama_siswa').value,
         kelas: document.getElementById('kelas').value,
         tanggal: document.getElementById('tanggal').value,
@@ -426,10 +426,13 @@
 
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzMnpBfTAmR3CaVhMsIi6tOfg5kCfK_lqGyDHpZ8kM2gwtVwyucJHHtji_dBER_e28/exec";
 
+      // 👇 LETAKKAN DI SINI
+      console.log("DATA DIKIRIM:", formData);
+
       try {
         await fetch(WEB_APP_URL, {
           method: "POST",
-          /* mode: "no-cors", */
+          mode: "no-cors",
           body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json"
