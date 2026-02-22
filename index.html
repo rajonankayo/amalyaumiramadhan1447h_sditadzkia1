@@ -112,7 +112,7 @@
     <main class="max-w-4xl mx-auto px-4 pb-8 flex-1">
      <!-- Navigation Tabs -->
      <div class="flex justify-center gap-2 mb-6">
-      <button id="tab-input" onclick="showTab('input')" class="px-6 py-2 rounded-full font-medium transition-all bg-yellow-400 text-emerald-900"> ✍️ Input Amal </button> <button id="tab-riwayat" onclick="showTab('riwayat')" class="px-6 py-2 rounded-full font-medium transition-all bg-emerald-700 text-white hover:bg-emerald-600"> 📋 Riwayat </button>
+      <button id="tab-input" onclick="showTab('input')" class="px-6 py-2 rounded-full font-medium transition-all bg-yellow-400 text-emerald-900"> ✍️ Input Amal </button> <button id="tab-riwayat" onclick="window.open('https://docs.google.com/spreadsheets/d/1ZO8Rb2BsW97TzmmC8UgPQt7evLLrmzKzylEUGmDu1gU/edit?usp=sharing', '_blank')" class="px-6 py-2 rounded-full font-medium transition-all bg-emerald-700 text-white hover:bg-emerald-600"> 📋 Riwayat </button>
      </div><!-- Input Form Section -->
      <section id="section-input" class="animate-fade-in">
       <form id="amal-form" class="bg-white/95 backdrop-blur rounded-2xl shadow-xl p-6 glow-green">
@@ -281,23 +281,28 @@
     }
 
     function login(username, role, studentId) {
-      currentUser = { username, role, studentId };
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('dashboard-screen').classList.remove('hidden');
-      document.getElementById('current-user').textContent = username + (role === 'admin' ? ' (Admin)' : '');
-      
-      // Auto-fill form for siswa role
-      if (role === 'siswa' && studentId) {
-        document.getElementById('nama_siswa').value = `Siswa Ke-${studentId}`;
-        document.getElementById('kelas').value = 'Kelas 1';
-        document.getElementById('nama_siswa').readOnly = true;
-        document.getElementById('kelas').readOnly = true;
+
+        const userData = allUsers.find(u => u.username === username);
+
+        currentUser = userData;
+
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.remove('hidden');
+
+        document.getElementById('current-user').textContent =
+          userData.nama_siswa + (role === 'admin' ? ' (Admin)' : '');
+
+        // Auto-fill untuk siswa
+        if (role === 'siswa') {
+          document.getElementById('nama_siswa').value = userData.nama_siswa;
+          document.getElementById('kelas').value = userData.kelas;
+          document.getElementById('nama_siswa').readOnly = true;
+          document.getElementById('kelas').readOnly = true;
+        }
+
+        document.getElementById('user-username').value = '';
+        document.getElementById('user-password').value = '';
       }
-      
-      // Clear login form
-      document.getElementById('user-username').value = '';
-      document.getElementById('user-password').value = '';
-    }
 
     function logout() {
       currentUser = null;
@@ -369,6 +374,10 @@
     async function handleSubmit(e) {
       e.preventDefault();
 
+      if (!currentUser) {
+        showMessage('❌ Anda belum login.', 'error');
+        return;
+      }
       
 
       const submitBtn = document.getElementById('submit-btn');
@@ -383,6 +392,7 @@
       // Calculate points
       let totalPoin = 0;
       const formData = {
+        username_login: currentUser ? currentUser.username : null,
         nama_siswa: document.getElementById('nama_siswa').value,
         kelas: document.getElementById('kelas').value,
         tanggal: document.getElementById('tanggal').value,
@@ -419,7 +429,7 @@
       try {
         await fetch(WEB_APP_URL, {
           method: "POST",
-          mode: "no-cors",
+          /* mode: "no-cors", */
           body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json"
@@ -458,9 +468,24 @@
     }
 
     function resetForm() {
-      document.getElementById('amal-form').reset();
-      calculatePoints();
-    }
+
+        // Reset form (checkbox & tanggal)
+        document.getElementById('amal-form').reset();
+
+        calculatePoints();
+
+        // Jika siswa login → isi ulang nama & kelas
+        if (currentUser && currentUser.role === 'siswa') {
+          document.getElementById('nama_siswa').value = currentUser.nama_siswa;
+          document.getElementById('kelas').value = currentUser.kelas;
+        }
+
+        // Set tanggal kembali ke hari ini jika dalam range
+        const today = new Date().toISOString().split('T')[0];
+        if (today >= '2026-02-18' && today <= '2026-03-18') {
+          document.getElementById('tanggal').value = today;
+        }
+      }
 
     function renderRecords() {
       const container = document.getElementById('records-list');
